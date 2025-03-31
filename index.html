@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Games Collection</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: white;
+            border: 2px solid #000;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #000;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .game-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+
+        .game-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-title">Mini Games Collection</div>
+    <div class="games-grid">
+        <a href="games/click-game.html" class="game-card">
+            <h2>Click the Button!</h2>
+            <p>Test your reflexes by clicking the moving button as fast as you can!</p>
+        </a>
+        <a href="games/snake-game.html" class="game-card">
+            <h2>Snake</h2>
+            <p>Classic snake game - grow longer by eating food and avoid hitting yourself!</p>
+        </a>
+        <a href="games/pong-game.html" class="game-card">
+            <h2>Pong</h2>
+            <p>Classic Pong game - hit the ball back and forth!</p>
+        </a>
+        <a href="games/breakout-game.html" class="game-card">
+            <h2>Breakout</h2>
+            <p>Break all the bricks with your bouncing ball!</p>
+        </a>
+        <a href="games/memory-game.html" class="game-card">
+            <h2>Memory</h2>
+            <p>Test your memory by matching pairs of cards!</p>
+        </a>
+        <a href="games/whack-game.html" class="game-card">
+            <h2>Whack-a-Mole</h2>
+            <p>Whack the moles as they pop up from their holes!</p>
+        </a>
+        <a href="games/flappy-game.html" class="game-card">
+            <h2>Flappy Bird</h2>
+            <p>Navigate through pipes in this classic Flappy Bird game!</p>
+        </a>
+        <a href="games/space-game.html" class="game-card">
+            <h2>Space Shooter</h2>
+            <p>Shoot down alien ships in this space shooter game!</p>
+        </a>
+        <a href="games/puzzle-game.html" class="game-card">
+            <h2>Sliding Puzzle</h2>
+            <p>Arrange the tiles in order by sliding them around!</p>
+        </a>
+    </div>
+    <nav class="nav-bar">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="games/click-game.html" class="nav-link">Click Game</a>
+        <a href="games/snake-game.html" class="nav-link">Snake</a>
+        <a href="games/pong-game.html" class="nav-link">Pong</a>
+        <a href="games/breakout-game.html" class="nav-link">Breakout</a>
+        <a href="games/memory-game.html" class="nav-link">Memory</a>
+        <a href="games/whack-game.html" class="nav-link">Whack</a>
+        <a href="games/flappy-game.html" class="nav-link">Flappy</a>
+        <a href="games/space-game.html" class="nav-link">Space</a>
+        <a href="games/puzzle-game.html" class="nav-link">Puzzle</a>
+    </nav>
+</body>
+</html> 

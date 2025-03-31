@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake - Mini Games</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #gameArea {
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background-color: white;
+            border: 2px solid #000;
+            position: relative;
+        }
+
+        .snake-part {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #000;
+            border: 1px solid #fff;
+        }
+
+        .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        #score {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        #startButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #000;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-title">Snake</div>
+    <div class="game-container">
+        <div id="score">Score: 0</div>
+        <div id="gameArea"></div>
+        <button id="startButton">Start Game</button>
+    </div>
+    <nav class="nav-bar">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="click-game.html" class="nav-link">Click Game</a>
+        <a href="snake-game.html" class="nav-link">Snake</a>
+        <a href="pong-game.html" class="nav-link">Pong</a>
+        <a href="breakout-game.html" class="nav-link">Breakout</a>
+        <a href="memory-game.html" class="nav-link">Memory</a>
+        <a href="whack-game.html" class="nav-link">Whack</a>
+        <a href="flappy-game.html" class="nav-link">Flappy</a>
+        <a href="space-game.html" class="nav-link">Space</a>
+        <a href="puzzle-game.html" class="nav-link">Puzzle</a>
+    </nav>
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const scoreElement = document.getElementById('score');
+        const startButton = document.getElementById('startButton');
+
+        let snake = [];
+        let food = null;
+        let direction = 'right';
+        let gameInterval;
+        let score = 0;
+        let isPlaying = false;
+
+        function createFood() {
+            const x = Math.floor(Math.random() * 20) * 20;
+            const y = Math.floor(Math.random() * 20) * 20;
+            food = document.createElement('div');
+            food.className = 'food';
+            food.style.left = x + 'px';
+            food.style.top = y + 'px';
+            gameArea.appendChild(food);
+        }
+
+        function createSnakePart(x, y) {
+            const part = document.createElement('div');
+            part.className = 'snake-part';
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            return part;
+        }
+
+        function moveSnake() {
+            const head = snake[0];
+            const headX = parseInt(head.style.left);
+            const headY = parseInt(head.style.top);
+
+            let newX = headX;
+            let newY = headY;
+
+            switch(direction) {
+                case 'up': newY -= 20; break;
+                case 'down': newY += 20; break;
+                case 'left': newX -= 20; break;
+                case 'right': newX += 20; break;
+            }
+
+            // Check for collisions with walls
+            if (newX < 0 || newX >= 400 || newY < 0 || newY >= 400) {
+                gameOver();
+                return;
+            }
+
+            // Check for collisions with self
+            for (let part of snake) {
+                if (parseInt(part.style.left) === newX && parseInt(part.style.top) === newY) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            const newHead = createSnakePart(newX, newY);
+            gameArea.insertBefore(newHead, gameArea.firstChild);
+            snake.unshift(newHead);
+
+            // Check if snake ate food
+            if (food && parseInt(food.style.left) === newX && parseInt(food.style.top) === newY) {
+                score += 10;
+                scoreElement.textContent = `Score: ${score}`;
+                food.remove();
+                createFood();
+            } else {
+                const tail = snake.pop();
+                tail.remove();
+            }
+        }
+
+        function startGame() {
+            if (isPlaying) return;
+            
+            // Clear previous game
+            gameArea.innerHTML = '';
+            snake = [];
+            direction = 'right';
+            score = 0;
+            scoreElement.textContent = `Score: ${score}`;
+            startButton.disabled = true;
+            isPlaying = true;
+
+            // Create initial snake
+            const head = createSnakePart(200, 200);
+            gameArea.appendChild(head);
+            snake.push(head);
+
+            // Create food
+            createFood();
+
+            // Start game loop
+            gameInterval = setInterval(moveSnake, 100);
+        }
+
+        function gameOver() {
+            clearInterval(gameInterval);
+            isPlaying = false;
+            startButton.disabled = false;
+            alert(`Game Over! Your score: ${score}`);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!isPlaying) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down') direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') direction = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') direction = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left') direction = 'right';
+                    break;
+            }
+        });
+
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click the Button! - Mini Games</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #gameArea {
+            width: 100%;
+            height: 70vh;
+            position: relative;
+            background-color: white;
+            border: 2px solid #000;
+            overflow: hidden;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        #target {
+            position: absolute;
+            background-color: red;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        #score {
+            font-size: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #timer {
+            font-size: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #startButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-title">Click the Button!</div>
+    <div class="game-container">
+        <div id="score">Score: 0</div>
+        <div id="timer">Time: 30</div>
+        <div id="gameArea">
+            <button id="target"></button>
+        </div>
+        <button id="startButton">Start Game</button>
+    </div>
+    <nav class="nav-bar">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="click-game.html" class="nav-link">Click Game</a>
+        <a href="snake-game.html" class="nav-link">Snake</a>
+        <a href="pong-game.html" class="nav-link">Pong</a>
+        <a href="breakout-game.html" class="nav-link">Breakout</a>
+        <a href="memory-game.html" class="nav-link">Memory</a>
+        <a href="whack-game.html" class="nav-link">Whack</a>
+        <a href="flappy-game.html" class="nav-link">Flappy</a>
+        <a href="space-game.html" class="nav-link">Space</a>
+        <a href="puzzle-game.html" class="nav-link">Puzzle</a>
+    </nav>
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const target = document.getElementById('target');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let timerInterval;
+        let isPlaying = false;
+
+        function moveTarget() {
+            const maxX = gameArea.clientWidth - target.clientWidth;
+            const maxY = gameArea.clientHeight - target.clientHeight;
+            
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+            
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        function startGame() {
+            if (isPlaying) return;
+            
+            score = 0;
+            timeLeft = 30;
+            scoreElement.textContent = `Score: ${score}`;
+            timerElement.textContent = `Time: ${timeLeft}`;
+            startButton.disabled = true;
+            isPlaying = true;
+            
+            // Reset target size
+            target.style.width = '100px';
+            target.style.height = '100px';
+            
+            // Start timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Time: ${timeLeft}`;
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Move target every 2 seconds
+            gameInterval = setInterval(moveTarget, 2000);
+            
+            // Initial position
+            moveTarget();
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            isPlaying = false;
+            startButton.disabled = false;
+            alert(`Game Over! Your score: ${score}`);
+        }
+
+        target.addEventListener('click', () => {
+            if (!isPlaying) return;
+            
+            score++;
+            scoreElement.textContent = `Score: ${score}`;
+            
+            // Make target smaller
+            const currentWidth = parseInt(target.style.width);
+            const currentHeight = parseInt(target.style.height);
+            target.style.width = (currentWidth - 5) + 'px';
+            target.style.height = (currentHeight - 5) + 'px';
+            
+            moveTarget();
+        });
+
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html> 
