@@ -10,7 +10,7 @@
             width: 600px;
             height: 400px;
             margin: 0 auto;
-            background-color: white;
+            background-color: #f0f0f0;
             border: 2px solid #000;
             position: relative;
             overflow: hidden;
@@ -23,24 +23,27 @@
             background-color: #000;
             bottom: 20px;
             left: 250px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         #ball {
             position: absolute;
             width: 20px;
             height: 20px;
-            background-color: #000;
+            background-color: #ff4444;
             border-radius: 50%;
             left: 290px;
             bottom: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .brick {
             position: absolute;
             width: 60px;
             height: 20px;
-            background-color: #ff0000;
             border: 1px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .particle {
@@ -49,12 +52,17 @@
             height: 4px;
             border-radius: 50%;
             pointer-events: none;
+            z-index: 100;
         }
 
         #score {
             text-align: center;
             font-size: 24px;
             margin: 20px 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
 
         #startButton {
@@ -66,13 +74,27 @@
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #333;
+        }
+
+        #lives {
+            font-size: 24px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="game-title">Breakout</div>
     <div class="game-container">
-        <div id="score">Score: 0</div>
+        <div id="score">
+            <span>Score: 0</span>
+            <span id="lives">Lives: 3</span>
+        </div>
         <div id="gameArea">
             <div class="paddle"></div>
             <div id="ball"></div>
@@ -93,12 +115,14 @@
     </nav>
     <script>
         const gameArea = document.getElementById('gameArea');
-        const paddle = document.querySelector('.paddle');
-        const ball = document.getElementById('ball');
+        let paddle = document.querySelector('.paddle');
+        let ball = document.getElementById('ball');
         const scoreElement = document.getElementById('score');
+        let livesElement = document.getElementById('lives');
         const startButton = document.getElementById('startButton');
 
         let score = 0;
+        let lives = 3;
         let ballX = 290;
         let ballY = 330;
         let ballSpeedX = 5;
@@ -107,7 +131,7 @@
         let isPlaying = false;
         let bricks = [];
 
-        const BRICK_COLORS = ['#ff0000', '#ff6600', '#ffcc00', '#00ff00', '#0000ff'];
+        const BRICK_COLORS = ['#ff4444', '#ff8844', '#ffcc44', '#44ff44', '#4444ff'];
 
         function createBricks() {
             for (let row = 0; row < 5; row++) {
@@ -134,13 +158,11 @@
                 particle.style.top = y + 'px';
                 gameArea.appendChild(particle);
                 
-                // Random angle and speed for each particle
                 const angle = (Math.random() * Math.PI * 2);
                 const speed = 2 + Math.random() * 3;
                 const vx = Math.cos(angle) * speed;
                 const vy = Math.sin(angle) * speed;
                 
-                // Animate particle
                 let particleX = x;
                 let particleY = y;
                 let opacity = 1;
@@ -172,6 +194,15 @@
             const mouseX = e.clientX - rect.left;
             const paddleX = Math.max(0, Math.min(500, mouseX - 50));
             paddle.style.left = paddleX + 'px';
+        }
+
+        function resetBall() {
+            ballX = 290;
+            ballY = 330;
+            ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1);
+            ballSpeedY = -5;
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
         }
 
         function moveBall() {
@@ -225,7 +256,13 @@
             
             // Check for game over (ball hits bottom)
             if (ballY >= 380) {
-                gameOver();
+                lives--;
+                livesElement.textContent = `Lives: ${lives}`;
+                if (lives <= 0) {
+                    gameOver();
+                } else {
+                    resetBall();
+                }
             }
             
             ball.style.left = ballX + 'px';
@@ -239,28 +276,22 @@
             gameArea.innerHTML = '';
             
             // Create new paddle and ball
-            const newPaddle = document.createElement('div');
-            newPaddle.className = 'paddle';
-            gameArea.appendChild(newPaddle);
+            paddle = document.createElement('div');
+            paddle.className = 'paddle';
+            gameArea.appendChild(paddle);
             
-            const newBall = document.createElement('div');
-            newBall.id = 'ball';
-            gameArea.appendChild(newBall);
-            
-            // Update references
-            paddle = newPaddle;
-            ball = newBall;
+            ball = document.createElement('div');
+            ball.id = 'ball';
+            gameArea.appendChild(ball);
             
             score = 0;
+            lives = 3;
             scoreElement.textContent = `Score: ${score}`;
+            livesElement.textContent = `Lives: ${lives}`;
             startButton.disabled = true;
             isPlaying = true;
             
-            ballX = 290;
-            ballY = 330;
-            ballSpeedX = 5;
-            ballSpeedY = -5;
-            
+            resetBall();
             createBricks();
             
             gameInterval = setInterval(moveBall, 16);
@@ -270,7 +301,7 @@
             clearInterval(gameInterval);
             isPlaying = false;
             startButton.disabled = false;
-            alert(`Game Over! Your score: ${score}`);
+            alert(`Game Over!\nFinal Score: ${score}`);
         }
 
         gameArea.addEventListener('mousemove', movePaddle);

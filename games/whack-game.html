@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Mole - Mini Games</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        #gameArea {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background-color: #8B4513;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .hole {
+            background-color: #000;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .mole {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #8B4513;
+            border-radius: 50% 50% 0 0;
+            bottom: -100%;
+            transition: bottom 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+        }
+
+        .mole.up {
+            bottom: 0;
+        }
+
+        .mole.hit {
+            background-color: #ff4444;
+            animation: hit 0.1s;
+        }
+
+        @keyframes hit {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #score {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        #startButton {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #333;
+        }
+
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-title">Whack-a-Mole</div>
+    <div class="game-container">
+        <div id="score">
+            <span>Score: 0</span>
+            <span id="timer">Time: 30</span>
+        </div>
+        <div id="gameArea">
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+            <div class="hole"><div class="mole">🦔</div></div>
+        </div>
+        <button id="startButton">Start Game</button>
+        <div class="game-over">
+            <h2>Game Over!</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button id="restartButton">Play Again</button>
+        </div>
+    </div>
+    <nav class="nav-bar">
+        <a href="../index.html" class="nav-link">Home</a>
+        <a href="click-game.html" class="nav-link">Click Game</a>
+        <a href="snake-game.html" class="nav-link">Snake</a>
+        <a href="pong-game.html" class="nav-link">Pong</a>
+        <a href="breakout-game.html" class="nav-link">Breakout</a>
+        <a href="memory-game.html" class="nav-link">Memory</a>
+        <a href="whack-game.html" class="nav-link">Whack</a>
+        <a href="flappy-game.html" class="nav-link">Flappy</a>
+        <a href="space-game.html" class="nav-link">Space</a>
+        <a href="puzzle-game.html" class="nav-link">Puzzle</a>
+    </nav>
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const gameOverElement = document.querySelector('.game-over');
+        const finalScoreElement = document.getElementById('finalScore');
+
+        const holes = document.querySelectorAll('.hole');
+        const moles = document.querySelectorAll('.mole');
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+        let moleInterval;
+        let isPlaying = false;
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            scoreElement.textContent = `Score: ${score}`;
+            timerElement.textContent = `Time: ${timeLeft}`;
+            startButton.disabled = true;
+            gameOverElement.classList.remove('show');
+            isPlaying = true;
+
+            // Start timer
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Time: ${timeLeft}`;
+                if (timeLeft <= 0) {
+                    gameOver();
+                }
+            }, 1000);
+
+            // Start mole popping
+            moleInterval = setInterval(popMole, 1000);
+        }
+
+        function popMole() {
+            if (!isPlaying) return;
+
+            // Hide all moles
+            moles.forEach(mole => {
+                mole.classList.remove('up');
+                mole.classList.remove('hit');
+            });
+
+            // Show random mole
+            const randomHole = holes[Math.floor(Math.random() * holes.length)];
+            const mole = randomHole.querySelector('.mole');
+            mole.classList.add('up');
+
+            // Hide mole after random time
+            setTimeout(() => {
+                if (mole.classList.contains('up')) {
+                    mole.classList.remove('up');
+                }
+            }, Math.random() * 1000 + 500);
+        }
+
+        function whackMole(e) {
+            if (!isPlaying) return;
+
+            const mole = e.target;
+            if (mole.classList.contains('up') && !mole.classList.contains('hit')) {
+                mole.classList.add('hit');
+                score += 10;
+                scoreElement.textContent = `Score: ${score}`;
+            }
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            clearInterval(moleInterval);
+            startButton.disabled = false;
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.add('show');
+        }
+
+        moles.forEach(mole => {
+            mole.addEventListener('click', whackMole);
+        });
+
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html> 
