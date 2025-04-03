@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
+	<head>
     <title>ASCII Flappy Bird</title>
-    <style>
+		<style>
         body {
             margin: 0;
             width: 100%;
@@ -49,27 +49,27 @@
         }
         
         @-webkit-keyframes PipeMovement {
-            from {left: 100%}
-            to {left: -25%}
-        }
-        
-        .paused {
+                from {left: 100%}
+                to {left: -25%}
+            }
+            
+            .paused {
             -ms-animation-play-state: paused;
             -o-animation-play-state: paused;
             -moz-animation-play-state: paused;
             -webkit-animation-play-state: paused;
-            animation-play-state: paused;
-        }
-        
+                animation-play-state: paused;
+             }
+             
         .noSelect {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
+                 -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+             }
+             
         #LostScoreScreen {
             position: absolute;
             top: 50%;
@@ -153,37 +153,37 @@
             100% { opacity: 0; transform: translateY(-20px); }
         }
     </style>
-</head>
-<body>
-    <div id="Canvas">
+	</head>
+	<body>
+		<div id="Canvas">
         <div id="StartScreen" class="noSelect">
             <h2>ASCII Flappy Bird</h2>
             <p>Click to Fly</p>
             <p>Space Bar to Reset</p>
             <p>P to Pause</p>
-        </div>
-        
-        <div id="CurrentScoreCard" class="noSelect">
-            <span id="CurrentScore">0</span>
-        </div>
-        
-        <div id="LostScoreScreen" class="noSelect">
+            </div>
+                        
+                <div id="CurrentScoreCard" class="noSelect">
+                    <span id="CurrentScore">0</span>
+            </div>
+            
+                <div id="LostScoreScreen" class="noSelect">
             <h2>Game Over</h2>
             <p>Score: <span id="FinalScore">0</span></p>
             <p>Best: <span id="BestScore">0</span></p>
             <button id="ResetButton">Reset</button>
-        </div>
-        
+            </div>
+            
         <div id="PauseButton" class="noSelect">[P]</div>
-    </div>
-    
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script>
-        $(function(){
-            var canvasObject = $('#Canvas');
+		</div>
+		
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script>
+			$(function(){
+                var canvasObject = $('#Canvas');
             var startScreen = $('#StartScreen');
-            var gameLoopIntervalID = 0;
-            var Paused = true;
+                var gameLoopIntervalID = 0;
+                var Paused = true;
             var Lost = false;
             var CurrentScore = 0;
             
@@ -205,24 +205,24 @@
             var pipeGap = 5;
             var pipeInterval = 20;
             var pipeCounter = 0;
-            
-            function pauseGame(){
+                
+                function pauseGame(){
                 clearInterval(gameLoopIntervalID);
                 $('.Pipe').addClass('paused');
                 Paused = true;
-            }
-            
-            function startGame(){
-                if(Lost){
+                }
+                
+                function startGame(){
+                    if(Lost){
                     return;
                 }
                 gameLoopIntervalID = setInterval(function(){gameLoop();}, 100);
                 $('.Pipe').removeClass('paused');
                 Paused = false;
                 startScreen.hide();
-            }
-            
-            function endGame(){
+                }
+                
+                function endGame(){
                 Lost = true;
                 pauseGame();
                 var highScore = Math.max(CurrentScore, getHighScore());
@@ -230,9 +230,9 @@
                 $('#FinalScore').text(CurrentScore);
                 $('#BestScore').text(highScore);
                 $('#LostScoreScreen').show();
-            }
-            
-            function resetGame(){
+                }
+                
+                function resetGame(){
                 pauseGame();
                 $('.Pipe').remove();
                 Lost = false;
@@ -246,14 +246,14 @@
                 startGame();
             }
             
-            function togglePause(){
-                if(!Paused){
-                    pauseGame();
-                }else{
-                    startGame();
-                }
-            }
-            
+                function togglePause(){
+                    if(!Paused){
+                        pauseGame();
+                    }else{
+                        startGame();
+                    }
+                }                            
+                
             function jump(){
                 if(Paused){
                     return;
@@ -408,7 +408,7 @@
                 } else if(Lost){
                     resetGame();
                 } else {
-                    startGame();
+                startGame();     
                 }
             });
             
@@ -430,6 +430,6 @@
             // Initial render
             render();
         });
-    </script>
-</body>
-</html> 
+		</script>
+	</body>
+</html>

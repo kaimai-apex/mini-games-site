@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid #333;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #moves {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="moves">Moves: 0</div>
+    <div id="controls">
+        <button onclick="shufflePuzzle()">Shuffle</button>
+        <button onclick="resetPuzzle()">Reset</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const movesElement = document.getElementById('moves');
+
+        // Set canvas size
+        canvas.width = 400;
+        canvas.height = 400;
+
+        // Game variables
+        const gridSize = 3;
+        const tileSize = canvas.width / gridSize;
+        let moves = 0;
+        let puzzle = [];
+        let emptyPos = { x: gridSize - 1, y: gridSize - 1 };
+
+        // Initialize the puzzle
+        function initPuzzle() {
+            puzzle = [];
+            for (let y = 0; y < gridSize; y++) {
+                puzzle[y] = [];
+                for (let x = 0; x < gridSize; x++) {
+                    puzzle[y][x] = y * gridSize + x + 1;
+                }
+            }
+            puzzle[gridSize - 1][gridSize - 1] = 0; // Empty space
+            moves = 0;
+            movesElement.textContent = `Moves: ${moves}`;
+            drawPuzzle();
+        }
+
+        // Shuffle the puzzle
+        function shufflePuzzle() {
+            const directions = [
+                { x: 0, y: 1 },  // Down
+                { x: 0, y: -1 }, // Up
+                { x: 1, y: 0 },  // Right
+                { x: -1, y: 0 }  // Left
+            ];
+            
+            // Perform 100 random moves to shuffle
+            for (let i = 0; i < 100; i++) {
+                const validMoves = directions.filter(dir => {
+                    const newX = emptyPos.x + dir.x;
+                    const newY = emptyPos.y + dir.y;
+                    return newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize;
+                });
+                
+                const randomDir = validMoves[Math.floor(Math.random() * validMoves.length)];
+                const newX = emptyPos.x + randomDir.x;
+                const newY = emptyPos.y + randomDir.y;
+                
+                // Swap tiles
+                puzzle[emptyPos.y][emptyPos.x] = puzzle[newY][newX];
+                puzzle[newY][newX] = 0;
+                emptyPos = { x: newX, y: newY };
+            }
+            
+            moves = 0;
+            movesElement.textContent = `Moves: ${moves}`;
+            drawPuzzle();
+        }
+
+        // Reset the puzzle
+        function resetPuzzle() {
+            initPuzzle();
+        }
+
+        // Draw the puzzle
+        function drawPuzzle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const value = puzzle[y][x];
+                    if (value !== 0) {
+                        // Draw tile
+                        ctx.fillStyle = '#4CAF50';
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize - 2, tileSize - 2);
+                        
+                        // Draw number
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 40px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(
+                            value.toString(),
+                            x * tileSize + tileSize / 2,
+                            y * tileSize + tileSize / 2
+                        );
+                    }
+                }
+            }
+        }
+
+        // Check if the puzzle is solved
+        function isSolved() {
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const expectedValue = y * gridSize + x + 1;
+                    if (x === gridSize - 1 && y === gridSize - 1) {
+                        if (puzzle[y][x] !== 0) return false;
+                    } else if (puzzle[y][x] !== expectedValue) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // Handle tile movement
+        function moveTile(x, y) {
+            // Check if the clicked tile is adjacent to the empty space
+            const dx = Math.abs(x - emptyPos.x);
+            const dy = Math.abs(y - emptyPos.y);
+            
+            if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                // Swap tiles
+                puzzle[emptyPos.y][emptyPos.x] = puzzle[y][x];
+                puzzle[y][x] = 0;
+                emptyPos = { x, y };
+                moves++;
+                movesElement.textContent = `Moves: ${moves}`;
+                drawPuzzle();
+                
+                // Check if puzzle is solved
+                if (isSolved()) {
+                    setTimeout(() => {
+                        alert(`Congratulations! You solved the puzzle in ${moves} moves!`);
+                    }, 100);
+                }
+            }
+        }
+
+        // Handle canvas click
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / tileSize);
+            const y = Math.floor((e.clientY - rect.top) / tileSize);
+            
+            if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+                moveTile(x, y);
+            }
+        });
+
+        // Initialize the game
+        initPuzzle();
+    </script>
+</body>
+</html> 
